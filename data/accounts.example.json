@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "updated_at": "2026-01-01T00:00:00+00:00",
+  "users": {
+    "123456789012345678": {
+      "display_name": "Nguyễn Văn A (tên nội bộ)",
+      "notes": "Đã xác minh danh tính. Liên hệ qua Discord.",
+      "updated_at": "2026-01-01T00:00:00+00:00",
+      "accounts": [
+        {
+          "type": "github",
+          "handle": "csnhng-lang",
+          "label": "GitHub chính",
+          "url": "https://github.com/csnhng-lang",
+          "visibility": "public",
+          "verified": true
+        },
+        {
+          "type": "steam",
+          "handle": "gaben",
+          "label": "Steam",
+          "visibility": "restricted",
+          "verified": false
+        }
+      ]
+    }
+  }
+}

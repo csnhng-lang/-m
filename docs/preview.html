@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview embed — bot giới thiệu tài khoản</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 18px 56px;
+    background: #313338; color: #dbdee1;
+    font-family: "gg sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.45;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; color: #f2f3f5; margin: 0 0 4px; }
+  .sub { color: #949ba4; font-size: 13px; margin-bottom: 22px; }
+  .msg { display: flex; gap: 14px; margin-bottom: 26px; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex: 0 0 40px;
+    background: #5865f2; color: #fff; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; font-size: 16px;
+  }
+  .body { min-width: 0; }
+  .author { font-weight: 600; color: #f2f3f5; }
+  .author .bot {
+    background: #5865f2; color: #fff; font-size: 10px; padding: 1px 4px;
+    border-radius: 3px; margin-left: 6px; vertical-align: 2px; text-transform: uppercase;
+  }
+  .embed {
+    margin-top: 6px; background: #2b2d31; border-radius: 4px; padding: 14px 16px;
+    max-width: 100%; overflow-wrap: anywhere;
+  }
+  .label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    color: #949ba4; margin-bottom: 10px;
+  }
+  .title { font-size: 16px; font-weight: 600; color: #f2f3f5; margin-bottom: 8px; }
+  .desc { font-size: 14px; margin-bottom: 8px; }
+  .field { margin-top: 12px; }
+  .fname { font-size: 14px; font-weight: 600; color: #f2f3f5; margin-bottom: 3px; }
+  .fvalue { font-size: 14px; white-space: pre-wrap; }
+  .footer { margin-top: 14px; font-size: 12px; color: #949ba4; }
+  code {
+    background: #1e1f22; border-radius: 3px; padding: 1px 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+  }
+  a { color: #00a8fc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .note {
+    color: #949ba4; font-size: 13px; border-left: 3px solid #4e5058;
+    padding: 8px 12px; margin: 0 0 26px; background: #2b2d31; border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bot giới thiệu tài khoản — xem trước output</h1>
+  <div class="sub">Ảnh chụp tĩnh dựng trực tiếp từ <code>embeds.build_profile_embed()</code> — đúng dữ liệu bot sẽ gửi.</div>
+  <div class="note">
+    Panel 1: người bình thường mention nhau trong kênh.<br>
+    Panel 2: quản trị viên xem bằng <code>/whois</code> với <code>rieng_tu:true</code> — thấy thêm ghi chú và tài khoản <em>restricted</em>.
+  </div>
+  <div class="msg">
+    <div class="avatar">D</div>
+    <div class="body">
+      <div class="author">Bot giới thiệu tài khoản<span class="bot">bot</span></div>
+      <div class="embed" style="border-left:4px solid #e67e22">
+<div class="label">Người thường xem · 1007 ký tự</div>
+<div class="title">Hồ sơ: Cao Sỹ Nhân</div>
+<div class="field"><div class="fname">👤 Tài khoản Discord</div><div class="fvalue"><strong>ID:</strong> <code>123456789012345678</code>
+<strong>Username:</strong> <code>csnhng</code>
+<strong>Biệt danh (server):</strong> nhan
+<strong>Tạo tài khoản:</strong> 25/08/2023 06:24 UTC · 3 năm 2 tháng trước
+<strong>Vào server:</strong> 21/04/2026 06:24 UTC · 7 tháng trước
+<strong>Boost từ:</strong> 03/10/2026 06:24 UTC · 1 tháng 15 ngày trước
+<strong>Trạng thái:</strong> 🟢 Đang online
+<strong>Hoạt động:</strong> Visual Studio Code, Đang code bot Discord
+<strong>Huy hiệu:</strong> Active Developer, Early Supporter</div></div>
+<div class="field"><div class="fname">🎭 Vai trò</div><div class="fvalue"><strong>Vai trò cao nhất:</strong> Admin
+<strong>Vai trò (3):</strong> Admin, Developer, Member</div></div>
+<div class="field"><div class="fname">🔗 Tài khoản liên kết</div><div class="fvalue">• <a href="https://github.com/csnhng-lang" target="_blank" rel="noopener"><strong>GitHub chính</strong> · <code>csnhng-lang</code></a> — <u>GitHub</u> · ✅ đã xác minh
+   ↳ thêm 4 tháng trước
+• <a href="https://steamcommunity.com/id/nhan_gaming" target="_blank" rel="noopener"><strong>Steam</strong> · <code>nhan_gaming</code></a> — <u>Steam</u>
+   ↳ thêm 1 tháng trước</div></div>
+<div class="field"><div class="fname">🐙 GitHub (công khai)</div><div class="fvalue">• <a href="https://github.com/csnhng-lang" target="_blank" rel="noopener"><strong>csnhng-lang</strong></a> — Cao Sy Nhan — 14 repo · 37 follower
+   ↳ <em>Backend dev · thích bot Discord</em>
+   ↳ Bắc Ninh, Việt Nam
+   ↳ tạo tài khoản 4 năm 1 tháng trước</div></div>
+<div class="footer">Yêu cầu bởi Minh Anh · Dữ liệu nội bộ cập nhật 0 giây trước</div>
+</div>
+    </div>
+  </div>
+  <div class="msg">
+    <div class="avatar">D</div>
+    <div class="body">
+      <div class="author">Bot giới thiệu tài khoản<span class="bot">bot</span></div>
+      <div class="embed" style="border-left:4px solid #e67e22">
+<div class="label">Staff xem (ephemeral) · 1293 ký tự</div>
+<div class="title">Hồ sơ: Cao Sỹ Nhân</div>
+<div class="field"><div class="fname">👤 Tài khoản Discord</div><div class="fvalue"><strong>ID:</strong> <code>123456789012345678</code>
+<strong>Username:</strong> <code>csnhng</code>
+<strong>Biệt danh (server):</strong> nhan
+<strong>Tạo tài khoản:</strong> 25/08/2023 06:24 UTC · 3 năm 2 tháng trước
+<strong>Vào server:</strong> 21/04/2026 06:24 UTC · 7 tháng trước
+<strong>Boost từ:</strong> 03/10/2026 06:24 UTC · 1 tháng 15 ngày trước
+<strong>Trạng thái:</strong> 🟢 Đang online
+<strong>Hoạt động:</strong> Visual Studio Code, Đang code bot Discord
+<strong>Huy hiệu:</strong> Active Developer, Early Supporter</div></div>
+<div class="field"><div class="fname">🎭 Vai trò</div><div class="fvalue"><strong>Vai trò cao nhất:</strong> Admin
+<strong>Vai trò (3):</strong> Admin, Developer, Member</div></div>
+<div class="field"><div class="fname">🔗 Tài khoản liên kết</div><div class="fvalue">• <strong>nhan@example.com</strong> — <u>Email</u> · ✅ đã xác minh · 🔒 nội bộ
+   ↳ thêm 10 ngày trước
+• <a href="https://github.com/csnhng-lang" target="_blank" rel="noopener"><strong>GitHub chính</strong> · <code>csnhng-lang</code></a> — <u>GitHub</u> · ✅ đã xác minh
+   ↳ thêm 4 tháng trước
+• <strong>Riot (LMHT)</strong> · <code>Nhan#VN1</code> — <u>Riot Games</u> · 🔒 nội bộ
+   ↳ Chỉ dùng khi xử lý tranh chấp
+   ↳ thêm 10 ngày trước
+• <a href="https://steamcommunity.com/id/nhan_gaming" target="_blank" rel="noopener"><strong>Steam</strong> · <code>nhan_gaming</code></a> — <u>Steam</u>
+   ↳ thêm 1 tháng trước</div></div>
+<div class="field"><div class="fname">📝 Ghi chú nội bộ</div><div class="fvalue">Đã xác minh danh tính qua video call. Ưu tiên liên hệ qua Discord.</div></div>
+<div class="field"><div class="fname">🐙 GitHub (công khai)</div><div class="fvalue">• <a href="https://github.com/csnhng-lang" target="_blank" rel="noopener"><strong>csnhng-lang</strong></a> — Cao Sy Nhan — 14 repo · 37 follower
+   ↳ <em>Backend dev · thích bot Discord</em>
+   ↳ Bắc Ninh, Việt Nam
+   ↳ tạo tài khoản 4 năm 1 tháng trước</div></div>
+<div class="footer">Yêu cầu bởi Admin · Dữ liệu nội bộ cập nhật 0 giây trước</div>
+</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

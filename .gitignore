@@ -1,0 +1,24 @@
+# bí mật — KHÔNG BAO GIỜ commit
+.env
+.env.*
+!.env.example
+
+# dữ liệu thật của server (chứa ID + ghi chú nội bộ)
+data/accounts.json
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# hệ điều hành / editor
+.DS_Store
+.idea/
+.vscode/
+
+# cache của sandbox/CI
+.cache/
