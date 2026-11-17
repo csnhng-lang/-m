@@ -22,3 +22,6 @@ venv/
 
 # cache của sandbox/CI
 .cache/
+
+# ảnh/tệp người dùng gửi qua chat — không thuộc dự án
+uploads/
