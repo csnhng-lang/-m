@@ -249,7 +249,9 @@ export class AccountBot {
  * bot mở một endpoint nhỏ để panel thấy tiến trình còn sống.
  */
 export function startHealthServer(logger) {
-  const rawPort = process.env.HEALTH_PORT ?? process.env.PORT ?? '';
+  // Botkeep/Pterodactyl có thể đặt SERVER_PORT; một số panel khác dùng PORT.
+  const rawPort =
+    process.env.HEALTH_PORT ?? process.env.SERVER_PORT ?? process.env.PORT ?? '';
   const port = Number.parseInt(String(rawPort), 10);
   if (!Number.isInteger(port) || port <= 0) return null;
 

@@ -26,17 +26,13 @@ command, không phải đổi runtime nữa.
 1. **Tạo/giữ server kiểu Node.js.** Chọn phiên bản **Node 22** nếu có (tối thiểu 18).
 2. **Nguồn code:** *GitHub* → repo `csnhng-lang/-m` → nhánh `main`.
    Hoặc tải ZIP → *Upload files* → giải nén sao cho **`package.json` nằm ngay ở project root**.
-3. **Startup command:** đúng một dòng
+3. **Startup command** — chọn một trong ba, theo thứ tự an toàn giảm dần:
 
-   ```
-   npm start
-   ```
-
-   Nếu panel không tự cài dependency (log báo `Cannot find package 'discord.js'`):
-
-   ```
-   npm ci && npm start
-   ```
+   | Lệnh | Khi nào dùng |
+   |---|---|
+   | `bash start.sh` | **Khuyến nghị.** Tự cài dependency nếu thiếu, in môi trường, rồi chạy bot — sai ở đâu thấy ngay ở đó |
+   | `npm ci && npm start` | Panel chưa cài dependency (`Cannot find package 'discord.js'`) |
+   | `npm start` | Chắc chắn `node_modules` đã có |
 
 4. **Environment / Secrets** (mục này thay cho `.env` — **không upload `.env`**):
 
@@ -112,7 +108,17 @@ Ba nguyên nhân theo thứ tự hay gặp:
 | 3 | Token sai / đã Reset | `DISCORD_TOKEN không hợp lệ hoặc đã bị thu hồi` (mã thoát 4) | Reset Token → dán lại |
 
 Ngoài ra bot giờ log **từng bước khởi động** `[1/5] … [5/5]`, nên nhìn dòng cuối là biết nó chết ở đâu.
-Nếu panel yêu cầu process phải mở cổng, đặt `HEALTH_PORT` (hoặc `PORT`) — bot sẽ mở endpoint `/` trả `{"ok":true}`.
+Nếu panel yêu cầu process phải mở cổng, bot tự mở endpoint `/` trên `HEALTH_PORT`, `SERVER_PORT` hoặc `PORT`
+(panel tự đặt biến nào thì bot dùng biến đó) — trả `{"ok":true}` để panel thấy tiến trình còn sống.
+
+### Đọc log trên panel
+
+| Tab | Việc cần làm |
+|---|---|
+| **Console** | Sau khi bấm Start, xem 10 dòng cuối. Có thể gõ lệnh trực tiếp: `node scripts/doctor.mjs --login` |
+| **Startup** | Kiểm tra đúng startup command (`bash start.sh`) và project root |
+| **Files** | Xác nhận `package.json` nằm ngay thư mục gốc, không nằm trong thư mục con |
+| **Environment** | Xác nhận có `DISCORD_TOKEN` (và `GUILD_ID`) |
 
 ## 5. Sự cố thường gặp trên panel
 

@@ -14,7 +14,8 @@
     "manage": "node scripts/manage.mjs",
     "preview": "node scripts/preview.mjs",
     "check": "node --check src/index.js && node --check src/embeds.js && node --check src/store.js",
-    "doctor": "node scripts/doctor.mjs"
+    "doctor": "node scripts/doctor.mjs",
+    "start:panel": "bash start.sh"
   },
   "dependencies": {
     "discord.js": "^14.16.3"
