@@ -133,8 +133,9 @@ def from_env(env: Mapping[str, str] | None = None, *, require_token: bool = True
     token = (env.get("DISCORD_TOKEN") or "").strip()
     if require_token and not token:
         raise ConfigError(
-            "Thiếu DISCORD_TOKEN. Tạo bot tại https://discord.com/developers/applications, "
-            "copy token vào file .env (xem .env.example)."
+            "Thiếu DISCORD_TOKEN. Tạo bot tại https://discord.com/developers/applications → Bot → "
+            "Reset Token, rồi đặt biến môi trường DISCORD_TOKEN (máy local: file .env theo "
+            ".env.example; panel hosting như Botkeep: mục Environment/Secrets, KHÔNG upload .env)."
         )
 
     mention_trigger = (env.get("MENTION_TRIGGER") or "bot").strip().lower()

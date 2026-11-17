@@ -96,6 +96,22 @@ https://discord.com/api/oauth2/authorize?client_id=YOUR_APP_ID&permissions=84992
 
 ---
 
+## 4b. Deploy lên hosting (Botkeep, Pterodactyl, panel Python)
+
+Panel Python thường chạy `python main.py` → repo này đã có sẵn `main.py` làm entry point.
+
+```
+Runtime:   Python 3.11+            (KHÔNG chọn Node.js — sẽ báo thiếu package.json)
+Start:     python main.py          (hoặc: pip install -r requirements.txt && python main.py)
+Nguồn:     GitHub repo này, nhánh main
+Secrets:   DISCORD_TOKEN, GUILD_ID … đặt ở mục Environment (không upload .env)
+```
+
+Chi tiết + bảng sự cố: [`docs/DEPLOY-BOTKEEP.md`](docs/DEPLOY-BOTKEEP.md)
+
+> Lưu ý: `data/accounts.json` nằm trong `.gitignore`. Mỗi lần redeploy từ GitHub thư mục dự án có thể
+> bị dựng lại — trỏ `DATA_PATH` vào vùng lưu trữ bền và sao lưu định kỳ.
+
 ## 5. Chạy bằng Docker (tuỳ chọn)
 
 ```bash
@@ -213,6 +229,7 @@ python scripts/manage.py list --data data/khac.json   # --data đặt trước h
 ## 10. Kiến trúc
 
 ```
+main.py              Entry point cho hosting (`python main.py`) — chuyển tiếp sang bot.main()
 bot.py               Vòng đời bot, lệnh slash/menu/mention, cooldown, quyền, xử lý lỗi
 config.py            Nạp .env + validate cấu hình, che token khi log
 models.py            Dataclass thuần + làm sạch văn bản (không import discord.py → test dễ)
@@ -221,7 +238,7 @@ embeds.py            Dựng embed + cắt ngắn theo giới hạn Discord (6000
 github_api.py        Tra GitHub công khai: cache TTL, xử lý 404/rate limit
 scripts/manage.py    CLI quản lý dữ liệu
 scripts/preview_embed.py  Xem trước embed (terminal / HTML), kiểm tra độ dài
-tests/               134 test: models, store, config, embeds, github, logic bot, CLI
+tests/               137 test: models, store, config, embeds, github, logic bot, CLI, entrypoint
 ```
 
 Kiểm tra chất lượng:
