@@ -1,0 +1,21 @@
+{
+  "name": "discord-account-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bot Discord: mention @user để xem hồ sơ + tài khoản liên kết chi tiết",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/",
+    "manage": "node scripts/manage.mjs",
+    "preview": "node scripts/preview.mjs",
+    "check": "node --check src/index.js && node --check src/embeds.js && node --check src/store.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3"
+  }
+}

@@ -1,10 +1,19 @@
 # Bot Discord — giới thiệu tài khoản khi @user
 
-Bot Discord (Python, `discord.py` 2.x) trả về **thẻ hồ sơ chi tiết** mỗi khi có người mention một thành viên,
-kèm danh sách **các tài khoản liên kết** (GitHub, Steam, Riot, email…) do quản trị server tự nhập.
+Bot Discord trả về **thẻ hồ sơ chi tiết** mỗi khi có người mention một thành viên, kèm danh sách
+**các tài khoản liên kết** (GitHub, Steam, Riot, email…) do quản trị server tự nhập.
 
-> Xem trước output thật (dựng trực tiếp từ code): mở [`docs/preview.html`](docs/preview.html)
-> — tạo lại bằng `python scripts/preview_embed.py --html docs/preview.html`
+Repo có **hai bản chạy được, dùng chung dữ liệu và chung file `.env`**:
+
+| Bản | Ngôn ngữ | Entry point | Dùng khi nào |
+|---|---|---|---|
+| **Node.js** (chính) | Node 18+ · discord.js 14 | `npm start` → `src/index.js` | Host mặc định Node.js, hoặc panel báo *"expects /package.json"* |
+| Python | Python 3.11+ · discord.py 2.x | `python main.py` | Host runtime Python |
+
+Cả hai đọc/ghi **cùng một** `data/accounts.json` với cùng cấu trúc, nên đổi qua lại không mất dữ liệu.
+
+> Xem trước output thật: [`docs/preview.html`](docs/preview.html) (dựng từ code)
+> hoặc `node scripts/preview.mjs` / `python scripts/preview_embed.py`
 
 ```
 @Bot @user        →  bot trả lời bằng embed hồ sơ (mặc định)
@@ -36,91 +45,88 @@ kèm danh sách **các tài khoản liên kết** (GitHub, Steam, Riot, email…
 
 **Bot KHÔNG làm và không thể làm:** không đọc email/số điện thoại/tin nhắn riêng của ai, không đăng nhập
 vào tài khoản của người khác, không lấy dữ liệu từ server mà bot không ở trong, không gửi dữ liệu ra
-ngoài (trừ gọi GitHub API công khai khi bạn bật tính năng đó). Mọi thứ không có trong bảng trên là
-**không có trong code**.
+ngoài (trừ gọi GitHub API công khai khi bạn bật tính năng đó).
 
 ---
 
-## 2. Yêu cầu
-
-- Python **3.11+** (đã kiểm tra trên 3.13)
-- Một ứng dụng bot trên Discord Developer Portal
-- Server mà bạn có quyền quản lý
-
----
-
-## 3. Cài đặt nhanh
+## 2. Chạy bản Node.js (khuyến nghị)
 
 ```bash
 git clone https://github.com/csnhng-lang/-m.git
-cd ./-m          # tên repo có dấu "-" nên cần ./
+cd ./-m            # tên repo có dấu "-" nên cần ./
 
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+npm ci             # hoặc: npm install
+cp .env.example .env   # điền DISCORD_TOKEN (+ GUILD_ID)
+npm start
+```
+
+Log khi chạy đúng:
+
+```
+07:14:27 | INFO    | accountbot | Đã nạp 0 hồ sơ từ data/accounts.json
+07:14:28 | INFO    | accountbot | Đã đăng nhập: TenBot#1234
+07:14:28 | INFO    | accountbot | Đã đồng bộ 4 lệnh vào guild 123456789012345678
+```
+
+Lệnh phụ:
+
+```bash
+npm test                            # 113 test (node:test), không cần token
+node scripts/preview.mjs            # xem trước embed + độ dài ký tự
+node scripts/manage.mjs list        # CLI quản lý dữ liệu
+```
+
+## 2b. Deploy lên hosting (Botkeep, Pterodactyl, panel Node.js)
+
+```
+Runtime:   Node.js 18+  (Botkeep gợi ý Node 22)
+Start:     npm start
+Nguồn:     GitHub → csnhng-lang/-m → nhánh main
+Secrets:   DISCORD_TOKEN, GUILD_ID … đặt ở mục Environment (KHÔNG upload .env)
+```
+
+Chi tiết + bảng sự cố: [`docs/DEPLOY-BOTKEEP.md`](docs/DEPLOY-BOTKEEP.md)
+
+## 3. Chạy bản Python (tuỳ chọn)
+
+```bash
+python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-cp .env.example .env               # Windows: copy .env.example .env
-# mở .env, điền DISCORD_TOKEN (và GUILD_ID để lệnh slash hiện ngay)
-python bot.py
+cp .env.example .env
+python main.py                                      # hoặc: python bot.py
 ```
 
-Nếu log in được, bạn sẽ thấy:
+Trên panel Python, startup command là `python main.py` (hoặc `pip install -r requirements.txt && python main.py`).
 
-```
-INFO | accountbot | Đã nạp 0 hồ sơ từ data/accounts.json
-INFO | accountbot | Đã đồng bộ 4 lệnh vào guild 123456789012345678
+## 4. Docker
+
+```bash
+docker build -f Dockerfile.node -t account-bot . && docker run --env-file .env -v ./data:/app/data account-bot
+docker build -f Dockerfile -t account-bot-py .       # bản Python
 ```
 
 ---
 
-## 4. Tạo bot trên Discord Developer Portal
+## 5. Tạo bot trên Discord Developer Portal
 
-1. Vào <https://discord.com/developers/applications> → **New Application** → đặt tên.
-2. Tab **Bot** → **Reset Token** → copy token vào `DISCORD_TOKEN` trong `.env`.
-   (Token chỉ hiện một lần. Không commit, không dán vào chat.)
-3. Vẫn ở tab **Bot**, bật **Privileged Gateway Intents**:
+1. Vào <https://discord.com/developers/applications> → **New Application**.
+2. Tab **Bot** → **Reset Token** → copy vào `DISCORD_TOKEN`.
+3. Vẫn tab **Bot**, bật **Privileged Gateway Intents**:
    - ✅ **MESSAGE CONTENT INTENT** — bắt buộc để bot đọc được mention.
    - ✅ **SERVER MEMBERS INTENT** — bắt buộc để lấy vai trò/ngày vào server.
-   - ⬜ **PRESENCE INTENT** — tuỳ chọn, chỉ bật nếu muốn hiện online/đang chơi gì
-     (bật thì đặt `PRESENCE_INTENT=true`).
-4. Tab **OAuth2 → URL Generator**: scope `bot` + `applications.commands`,
-   quyền tối thiểu: `View Channels`, `Send Messages`, `Embed Links`, `Read Message History`.
-5. Mở URL vừa tạo để mời bot vào server. Link mẫu (thay `YOUR_APP_ID`):
+   - ⬜ **PRESENCE INTENT** — tuỳ chọn (bật thì đặt `PRESENCE_INTENT=true`).
+   - **Requires OAuth2 Code Grant** phải **TẮT**.
+4. Tab **OAuth2 → URL Generator**: scope `bot` + `applications.commands`, quyền
+   `View Channels`, `Send Messages`, `Embed Links`, `Read Message History` (= **84992**).
+5. Mời bot bằng link mẫu (thay `YOUR_APP_ID`):
 
 ```
 https://discord.com/api/oauth2/authorize?client_id=YOUR_APP_ID&permissions=84992&scope=bot%20applications.commands
 ```
 
-6. Lấy **Server ID** (bật Developer Mode trong Discord → chuột phải server → Copy Server ID)
-   và điền vào `GUILD_ID` trong `.env` để lệnh slash hiện ngay thay vì chờ tới 1 giờ.
+6. (Khuyến nghị) Điền `GUILD_ID` để lệnh slash hiện ngay thay vì chờ tới 1 giờ.
 
----
-
-## 4b. Deploy lên hosting (Botkeep, Pterodactyl, panel Python)
-
-Panel Python thường chạy `python main.py` → repo này đã có sẵn `main.py` làm entry point.
-
-```
-Runtime:   Python 3.11+            (KHÔNG chọn Node.js — sẽ báo thiếu package.json)
-Start:     python main.py          (hoặc: pip install -r requirements.txt && python main.py)
-Nguồn:     GitHub repo này, nhánh main
-Secrets:   DISCORD_TOKEN, GUILD_ID … đặt ở mục Environment (không upload .env)
-```
-
-Chi tiết + bảng sự cố: [`docs/DEPLOY-BOTKEEP.md`](docs/DEPLOY-BOTKEEP.md)
-
-> Lưu ý: `data/accounts.json` nằm trong `.gitignore`. Mỗi lần redeploy từ GitHub thư mục dự án có thể
-> bị dựng lại — trỏ `DATA_PATH` vào vùng lưu trữ bền và sao lưu định kỳ.
-
-## 5. Chạy bằng Docker (tuỳ chọn)
-
-```bash
-cp .env.example .env    # điền token
-docker compose up -d --build
-docker compose logs -f
-```
-
-Dữ liệu nằm ở `./data` (đã mount ra ngoài container nên không mất khi rebuild).
+Chi tiết từng bước + bản dịch nhãn tiếng Việt: [`docs/INVITE.md`](docs/INVITE.md)
 
 ---
 
@@ -146,7 +152,7 @@ Lệnh quản trị (cần quyền **Quản lý server**):
 
 ---
 
-## 7. Cấu hình (`.env`)
+## 7. Cấu hình (`.env` hoặc Environment của panel)
 
 | Biến | Mặc định | Ý nghĩa |
 |---|---|---|
@@ -156,12 +162,12 @@ Lệnh quản trị (cần quyền **Quản lý server**):
 | `COMMAND_PREFIX` | `!info` | Tiền tố lệnh chữ |
 | `EPHEMERAL` | `false` | `true` = mọi kết quả `/whois` chỉ người gọi thấy |
 | `COOLDOWN_SECONDS` | `8` | Chống spam: số giây tối thiểu giữa 2 lần xem cùng một người (`0` = tắt) |
-| `PRIVACY_ROLE_ID` | *(trống)* | Role được xem ghi chú nội bộ + tài khoản `restricted` (ngoài admin/Manage Server) |
+| `PRIVACY_ROLE_ID` | *(trống)* | Role được xem ghi chú nội bộ + tài khoản `restricted` |
 | `DATA_PATH` | `data/accounts.json` | Đường dẫn kho dữ liệu |
 | `LOG_LEVEL` | `INFO` | `DEBUG`/`INFO`/`WARNING`/`ERROR` |
-| `PRESENCE_INTENT` | `false` | Bật hiển thị online/hoạt động (phải bật intent tương ứng ở Portal) |
+| `PRESENCE_INTENT` | `false` | Bật hiển thị online/hoạt động (phải bật intent ở Portal) |
 | `GITHUB_ENRICH` | `false` | Tra hồ sơ GitHub công khai cho tài khoản `type=github` |
-| `GITHUB_TOKEN` | *(trống)* | Token GitHub **của bạn** để tăng hạn mức API (60 → 5.000 req/giờ). Không bắt buộc, không commit |
+| `GITHUB_TOKEN` | *(trống)* | Token GitHub của bạn để tăng hạn mức API (60 → 5.000 req/giờ). Không bắt buộc |
 
 ---
 
@@ -169,25 +175,23 @@ Lệnh quản trị (cần quyền **Quản lý server**):
 
 - **`visibility: public`** — ai xem hồ sơ cũng thấy.
 - **`visibility: restricted`** — chỉ hiện với admin/Manage Server/role trong `PRIVACY_ROLE_ID`, **và**
-  chỉ trong phản hồi riêng tư (`/whois ... rieng_tu:true` hoặc `EPHEMERAL=true`). Nhờ vậy staff xem
-  được dữ liệu nội bộ mà người khác trong kênh không thấy. Khi staff xem ở kênh công khai, mục đó bị
-  ẩn kèm ghi chú "_N tài khoản nội bộ bị ẩn_".
-- **Ghi chú nội bộ** cũng theo quy tắc trên.
-- Mọi văn bản do người dùng nhập (tên, biệt danh, handle, ghi chú) đều được **escape markdown** và
-  **bỏ ký tự vô hình** trước khi vào embed — chặn `@everyone`, link giả, chữ giả mạo bằng ký tự
-  zero-width. Bot luôn gửi với `AllowedMentions.none()` nên không ping ai.
-- `type`, `url`, `visibility` được validate: URL chỉ chấp nhận `http/https` (chặn `javascript:`).
-- File dữ liệu được ghi **atomic** (tmp + fsync + replace): mất điện giữa lúc ghi cũng không hỏng file.
-  Nếu file hỏng, bot **báo lỗi và dừng**, không bao giờ tự ghi đè dữ liệu của bạn.
-- Token chỉ đọc từ biến môi trường/file `.env`; log đã che token (`***abcd`). `.gitignore` đã chặn
-  `.env` và `data/accounts.json`.
-- Nhật ký thao tác quản trị (ai thêm/xoá tài khoản nào) được ghi ra log ở mức `INFO`.
+  chỉ trong phản hồi riêng tư (`/whois ... rieng_tu:true` hoặc `EPHEMERAL=true`). Khi staff xem ở kênh
+  công khai, mục đó bị ẩn kèm ghi chú "_N tài khoản nội bộ bị ẩn_".
+- **Ghi chú nội bộ** theo cùng quy tắc.
+- Mọi văn bản người dùng nhập (tên, biệt danh, handle, ghi chú) được **escape markdown** và **bỏ ký tự
+  vô hình** trước khi vào embed — chặn `@everyone`, link giả, chữ giả mạo bằng ký tự zero-width.
+  Bot luôn gửi với `allowedMentions: { parse: [] }` nên không ping ai.
+- `type`, `url`, `visibility` được validate: URL chỉ nhận `http/https` (chặn `javascript:`).
+- File dữ liệu ghi **atomic** (tmp + fsync + rename). File hỏng → bot **báo lỗi và dừng**, không tự ghi đè.
+- Token chỉ đọc từ biến môi trường; log đã che token (`***abcd`). `.gitignore` chặn `.env`,
+  `data/accounts.json`, `node_modules`, `uploads/`.
+- Nhật ký thao tác quản trị (ai thêm/xoá tài khoản nào) ghi ra log mức `INFO`.
 
 ---
 
 ## 9. Dữ liệu
 
-File `data/accounts.json` (tự tạo khi chạy lần đầu). Mẫu đầy đủ: [`data/accounts.example.json`](data/accounts.example.json)
+File `data/accounts.json` (tự tạo khi chạy lần đầu). Mẫu: [`data/accounts.example.json`](data/accounts.example.json)
 
 ```json
 {
@@ -212,44 +216,59 @@ File `data/accounts.json` (tự tạo khi chạy lần đầu). Mẫu đầy đ�
 }
 ```
 
-Quản lý bằng CLI (không cần mở Discord):
+Quản lý bằng CLI — **hai bản CLI tương đương, chọn cái nào cũng được**:
 
 ```bash
+# Node.js
+node scripts/manage.mjs list
+node scripts/manage.mjs add --user 123456789012345678 --type steam --handle gaben --visibility restricted
+node scripts/manage.mjs remove --user 123456789012345678 --type steam --handle gaben
+node scripts/manage.mjs note --user 123456789012345678 --text "Đã xác minh"
+node scripts/manage.mjs validate
+
+# Python
 python scripts/manage.py list
-python scripts/manage.py show 123456789012345678
 python scripts/manage.py add --user 123456789012345678 --type steam --handle gaben --visibility restricted
-python scripts/manage.py remove --user 123456789012345678 --type steam --handle gaben
-python scripts/manage.py note --user 123456789012345678 --text "Đã xác minh"
-python scripts/manage.py validate          # kiểm tra file có hợp lệ không
-python scripts/manage.py list --data data/khac.json   # --data đặt trước hoặc sau lệnh đều được
 ```
+
+> Trên hosting, `data/accounts.json` **không** nằm trong git. Mỗi lần redeploy có thể bị dựng lại →
+> trỏ `DATA_PATH` vào vùng lưu trữ bền và sao lưu định kỳ.
 
 ---
 
 ## 10. Kiến trúc
 
 ```
-main.py              Entry point cho hosting (`python main.py`) — chuyển tiếp sang bot.main()
-bot.py               Vòng đời bot, lệnh slash/menu/mention, cooldown, quyền, xử lý lỗi
-config.py            Nạp .env + validate cấu hình, che token khi log
-models.py            Dataclass thuần + làm sạch văn bản (không import discord.py → test dễ)
-store.py             Kho JSON, ghi atomic, validate schema, không ghi đè file hỏng
-embeds.py            Dựng embed + cắt ngắn theo giới hạn Discord (6000/1024 ký tự)
-github_api.py        Tra GitHub công khai: cache TTL, xử lý 404/rate limit
-scripts/manage.py    CLI quản lý dữ liệu
-scripts/preview_embed.py  Xem trước embed (terminal / HTML), kiểm tra độ dài
-tests/               137 test: models, store, config, embeds, github, logic bot, CLI, entrypoint
+# Bản Node.js (chính)
+src/index.js         Vòng đời bot: intents, đăng ký lệnh, mention, cooldown, mã thoát
+src/commands.js      Định nghĩa lệnh slash + xử lý interaction (whois/help/taikhoan/menu)
+src/render.js        Ghép Discord + store + GitHub thành embed; kiểm tra quyền staff
+src/snapshot.js      Trích dữ liệu từ discord.js thành object thuần
+src/embeds.js        Dựng embed + cắt theo giới hạn Discord (6000/1024/256)
+src/store.js         Kho JSON: ghi atomic, validate schema, tuần tự hoá ghi
+src/accounts.js      Kiểu dữ liệu + validate tài khoản/hồ sơ
+src/text.js          Làm sạch văn bản, escape markdown, humanDelta, timestamp
+src/github.js        GitHub API công khai: cache TTL, 404, rate limit
+scripts/manage.mjs   CLI quản lý dữ liệu
+scripts/preview.mjs  Xem trước embed trong terminal
+test/                113 test (node:test)
+
+# Bản Python (thay thế)
+main.py              Entry point cho panel Python
+bot.py, config.py, models.py, store.py, embeds.py, github_api.py
+scripts/manage.py, scripts/preview_embed.py
+tests/               137 test (pytest)
 ```
 
 Kiểm tra chất lượng:
 
 ```bash
+npm ci && npm test                       # Node
 pip install -r requirements-dev.txt
-ruff check .
-pytest
+ruff check . && pytest                   # Python
 ```
 
-CI (`.github/workflows/ci.yml`) chạy lint + test mỗi lần push.
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy cả hai bộ test mỗi lần push.
 
 ---
 
@@ -257,45 +276,42 @@ CI (`.github/workflows/ci.yml`) chạy lint + test mỗi lần push.
 
 | Hiện tượng | Nguyên nhân & cách xử lý |
 |---|---|
-| Bot online nhưng mention không phản hồi | Chưa bật **MESSAGE CONTENT INTENT** ở Portal, hoặc `MENTION_TRIGGER=bot` mà bạn chỉ mention người (thiếu mention bot) |
-| Lệnh slash không hiện | Chưa điền `GUILD_ID` (lệnh toàn cục mất tới 1 giờ) hoặc thiếu scope `applications.commands` khi mời bot |
-| `DISCORD_TOKEN không hợp lệ hoặc đã bị thu hồi` | Token sai/đã reset → copy lại vào `.env` |
+| Panel báo `startup command expects /package.json` | Server đang ở runtime Node nhưng thiếu `package.json` ở **project root** → chọn đúng root là thư mục có `package.json`, hoặc dùng bản Python với runtime Python |
+| `python: command not found` | Đang ở runtime Node.js → đổi runtime Python, hoặc dùng `npm start` |
+| Bot online nhưng mention không phản hồi | Chưa bật **MESSAGE CONTENT INTENT**, hoặc `MENTION_TRIGGER=bot` mà bạn chỉ mention người |
+| Lệnh slash không hiện | Chưa điền `GUILD_ID`, hoặc mời bot thiếu scope `applications.commands` |
+| `DISCORD_TOKEN không hợp lệ hoặc đã bị thu hồi` | Token sai/đã reset → copy lại; kiểm tra *Requires OAuth2 Code Grant* đã tắt |
+| `Used disallowed intents` | Portal chưa bật intent tương ứng với cấu hình (ví dụ `PRESENCE_INTENT=true`) |
 | Bot không gửi được embed | Thiếu quyền `Embed Links`/`Send Messages` ở kênh đó (log có WARNING) |
-| `Không nạp được dữ liệu: ... không phải JSON hợp lệ` | `data/accounts.json` bị sửa sai — bot dừng để bảo vệ dữ liệu. Chạy `python scripts/manage.py validate` |
-| Không thấy trạng thái online | Chưa bật `PRESENCE_INTENT=true` (và intent ở Portal) |
-| `⚠️ Hết quota GitHub API` | Bật `GITHUB_ENRICH` mà chưa có `GITHUB_TOKEN` (60 req/giờ) |
+| `Không nạp được dữ liệu: ... không phải JSON hợp lệ` | File dữ liệu bị sửa sai — bot dừng để bảo vệ dữ liệu. Chạy `manage.mjs validate` |
+| `⚠️ Hết quota GitHub API` | Bật `GITHUB_ENRICH` mà chưa có `GITHUB_TOKEN` |
 
 ---
 
 ## 12. Push code lên GitHub
 
-Repo đích: `https://github.com/csnhng-lang/-m`
-
 ```bash
-git init -b main
-git add .
-git status                 # xác nhận KHÔNG có .env và data/accounts.json
-git commit -m "feat: bot Discord giới thiệu tài khoản khi mention"
-git remote add origin https://github.com/csnhng-lang/-m.git
-git push -u origin main
+git add -A
+git status                 # xác nhận KHÔNG có .env, data/accounts.json, node_modules
+git commit -m "mô tả thay đổi"
+git push
 ```
 
-> **Quan trọng:** nếu bạn từng dán token GitHub ra chat/công cụ khác, hãy vào
-> GitHub → Settings → Developer settings → **Fine-grained tokens** → **Revoke** token đó rồi tạo token mới.
-> Token dùng cho bot chỉ cần quyền đọc `Public repositories` và phải nằm trong `.env`, không nằm trong code.
+> Nếu bạn từng dán token GitHub ra chat/công cụ khác: vào GitHub → Settings → Developer settings →
+> Fine-grained tokens → **Revoke** rồi tạo token mới. Token chỉ nên nằm trong `.env`, không nằm trong code.
 
 ---
 
 ## 13. Giới hạn đã biết
 
-- Người **không ở trong server** chỉ hiện được dữ liệu công khai của tài khoản Discord (tên, avatar, ngày tạo), không có vai trò/ngày vào server.
-- Bot chỉ trả lời trong server (bỏ qua DM) để tránh bị lạm dụng làm công cụ tra cứu.
-- `MENTION_TRIGGER=any` có thể gây spam ở kênh đông người — nên dùng `bot` (mặc định) hoặc đặt `COOLDOWN_SECONDS` cao hơn.
-- Dữ liệu tài khoản liên kết là **do admin nhập**, bot không tự xác minh quyền sở hữu. `verified` chỉ là nhãn đánh dấu.
+- Người **không ở trong server** chỉ hiện dữ liệu công khai của tài khoản Discord, không có vai trò/ngày vào server.
+- Bot bỏ qua DM để tránh bị dùng làm công cụ tra cứu.
+- `MENTION_TRIGGER=any` có thể gây spam ở kênh đông người — nên dùng `bot` (mặc định).
+- Dữ liệu tài khoản liên kết do **admin nhập**, bot không tự xác minh quyền sở hữu; `verified` chỉ là nhãn.
 - Chưa có web dashboard; mọi thao tác qua Discord hoặc CLI.
 
 ---
 
 ## 14. Giấy phép
 
-MIT — dùng, sửa, triển khai thoải mái.
+MIT — xem [LICENSE](LICENSE).

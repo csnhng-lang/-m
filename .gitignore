@@ -25,3 +25,11 @@ venv/
 
 # ảnh/tệp người dùng gửi qua chat — không thuộc dự án
 uploads/
+
+# node
+node_modules/
+npm-debug.log*
+coverage/
+
+# cache npm trong sandbox
+.npm/

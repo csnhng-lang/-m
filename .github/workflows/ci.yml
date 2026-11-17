@@ -6,7 +6,22 @@ on:
   pull_request:
 
 jobs:
-  test:
+  node:
+    name: Node.js (bản chính)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Cài dependency
+        run: npm ci
+      - name: Kiểm tra cú pháp + test
+        run: npm test
+
+  python:
+    name: Python (bản thay thế)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,5 +33,5 @@ jobs:
         run: pip install -r requirements-dev.txt
       - name: Lint
         run: ruff check .
-      - name: Kiểm tra cú pháp + test
+      - name: Test
         run: pytest
