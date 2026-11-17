@@ -7,6 +7,7 @@
  */
 
 import process from 'node:process';
+import { createServer } from 'node:http';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -243,11 +244,37 @@ export class AccountBot {
   }
 }
 
+/**
+ * Một số panel coi process là "chết" nếu không mở cổng. Nếu panel cấp HEALTH_PORT/PORT,
+ * bot mở một endpoint nhỏ để panel thấy tiến trình còn sống.
+ */
+export function startHealthServer(logger) {
+  const rawPort = process.env.HEALTH_PORT ?? process.env.PORT ?? '';
+  const port = Number.parseInt(String(rawPort), 10);
+  if (!Number.isInteger(port) || port <= 0) return null;
+
+  const startedAt = Date.now();
+  const server = createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    response.end(
+      JSON.stringify({ ok: true, uptimeSeconds: Math.round((Date.now() - startedAt) / 1000) }),
+    );
+  });
+  server.on('error', (error) => logger.warning(`Không mở được health port ${port}: ${error.message}`));
+  server.listen(port, '0.0.0.0', () => {
+    logger.info(`Health endpoint: http://0.0.0.0:${port}/ (giữ tiến trình sống nếu panel yêu cầu cổng)`);
+  });
+  return server;
+}
+
 // --------------------------------------------------------------------------- //
 // Khởi động
 // --------------------------------------------------------------------------- //
 export async function main() {
   loadDotenv();
+  const step = (index, total, message) => console.log(`${new Date().toTimeString().slice(0, 8)} | STEP    | accountbot | [${index}/${total}] ${message}`);
+
+  step(1, 5, 'đọc cấu hình từ biến môi trường');
   let config;
   try {
     config = fromEnv();
@@ -262,10 +289,21 @@ export async function main() {
   const logger = createLogger(config.logLevel);
   logger.info(`Cấu hình: ${JSON.stringify(redactConfig(config))}`);
 
-  // Kiểm tra dữ liệu trước khi đăng nhập: hỏng thì báo ngay.
+  // Bắt lỗi không lường trước để panel không "im lặng tắt" mà có dòng log rõ ràng.
+  process.on('uncaughtException', (error) => {
+    logger.critical(`Lỗi không bắt được (uncaughtException): ${error?.stack ?? error}`);
+    process.exit(1);
+  });
+  process.on('unhandledRejection', (reason) => {
+    logger.critical(`Promise bị từ chối không xử lý (unhandledRejection): ${reason?.stack ?? reason}`);
+    process.exit(1);
+  });
+
+  step(2, 5, `kiểm tra dữ liệu tại ${config.dataPath}`);
   const preflight = new AccountStore(config.dataPath);
   try {
     await preflight.load();
+    logger.info(`Dữ liệu hợp lệ: ${preflight.size} hồ sơ`);
   } catch (error) {
     if (error instanceof StoreError) {
       logger.error(`Không nạp được dữ liệu: ${error.message}`);
@@ -275,14 +313,18 @@ export async function main() {
   }
 
   const bot = new AccountBot(config);
+  const healthServer = startHealthServer(logger);
+
   const shutdown = async (signal) => {
     logger.info(`Nhận ${signal}, đang dừng...`);
+    healthServer?.close();
     await bot.stop().catch(() => {});
     process.exit(0);
   };
   process.on('SIGINT', () => void shutdown('SIGINT'));
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
 
+  step(3, 5, 'đăng nhập Discord');
   try {
     await bot.start();
   } catch (error) {
@@ -299,8 +341,12 @@ export async function main() {
       return 5;
     }
     logger.error(`Không khởi động được bot: ${message}`);
+    logger.error('Chạy `npm run doctor -- --login` để biết chính xác nguyên nhân.');
     return 1;
   }
+
+  step(4, 5, 'đăng ký lệnh slash (xem log phía trên)');
+  step(5, 5, 'bot đang chạy — giữ tiến trình ở foreground');
 
   // Giữ process sống (panel theo dõi tiến trình ở foreground).
   await new Promise(() => {});

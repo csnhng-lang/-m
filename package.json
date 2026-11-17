@@ -13,7 +13,8 @@
     "test": "node --test test/",
     "manage": "node scripts/manage.mjs",
     "preview": "node scripts/preview.mjs",
-    "check": "node --check src/index.js && node --check src/embeds.js && node --check src/store.js"
+    "check": "node --check src/index.js && node --check src/embeds.js && node --check src/store.js",
+    "doctor": "node scripts/doctor.mjs"
   },
   "dependencies": {
     "discord.js": "^14.16.3"

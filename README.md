@@ -71,7 +71,9 @@ Log khi chạy đúng:
 Lệnh phụ:
 
 ```bash
-npm test                            # 113 test (node:test), không cần token
+npm test                            # 116 test (node:test), không cần token
+npm run doctor                      # chẩn đoán: vì sao bot không chạy
+npm run doctor -- --login           # kiểm tra token bằng cách đăng nhập thật
 node scripts/preview.mjs            # xem trước embed + độ dài ký tự
 node scripts/manage.mjs list        # CLI quản lý dữ liệu
 ```
@@ -276,6 +278,8 @@ CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy cả hai bộ
 
 | Hiện tượng | Nguyên nhân & cách xử lý |
 |---|---|
+| **Bật lên rồi tắt ngay** | Chạy `npm run doctor -- --login` trong Console của panel — nó chỉ đúng lỗi. 3 nguyên nhân hay gặp: (1) thiếu `DISCORD_TOKEN` ở Environment, (2) chưa cài dependency → startup `npm ci && npm start`, (3) Node < 18 |
+| Log chỉ có `[1/5]…` rồi dừng | Thiếu cấu hình (thường là `DISCORD_TOKEN`) — xem dòng `[cấu hình]` ngay dưới |
 | Panel báo `startup command expects /package.json` | Server đang ở runtime Node nhưng thiếu `package.json` ở **project root** → chọn đúng root là thư mục có `package.json`, hoặc dùng bản Python với runtime Python |
 | `python: command not found` | Đang ở runtime Node.js → đổi runtime Python, hoặc dùng `npm start` |
 | Bot online nhưng mention không phản hồi | Chưa bật **MESSAGE CONTENT INTENT**, hoặc `MENTION_TRIGGER=bot` mà bạn chỉ mention người |

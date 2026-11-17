@@ -82,6 +82,38 @@ command, không phải đổi runtime nữa.
 - **Developer Portal → Bot:** bật **MESSAGE CONTENT INTENT** và **SERVER MEMBERS INTENT**.
   Thiếu MESSAGE CONTENT là bot chạy mà **không trả lời** khi bị mention.
 
+## 4b. Bot "bật lên rồi tắt ngay" — chẩn đoán 60 giây
+
+Panel chỉ hiện vài dòng log cuối nên rất dễ mất nguyên nhân. Chạy trong Console của panel:
+
+```
+npm run doctor -- --login
+```
+
+Nó tự kiểm tra và in kết quả từng mục:
+
+```
+✅ Phiên bản Node: v22.x
+✅ Thư mục làm việc: /home/container
+❌ dependency discord.js: CHƯA cài (node_modules không có discord.js)
+     → Đặt startup command thành `npm ci && npm start`
+❌ DISCORD_TOKEN: CHƯA ĐẶT
+     → Panel → Environment/Secrets → thêm DISCORD_TOKEN
+✅ Đăng nhập thử: thành công: TenBot#1234 · 1 server
+KẾT LUẬN: 2 lỗi chặn khởi động — sửa theo mũi tên ở trên.
+```
+
+Ba nguyên nhân theo thứ tự hay gặp:
+
+| # | Nguyên nhân | Dấu hiệu | Cách sửa |
+|---|---|---|---|
+| 1 | Chưa cài dependency | log `Cannot find package 'discord.js'` | startup command: `npm ci && npm start` |
+| 2 | Thiếu `DISCORD_TOKEN` | log `[cấu hình] Thiếu DISCORD_TOKEN…` (mã thoát 2) | thêm secret ở Environment |
+| 3 | Token sai / đã Reset | `DISCORD_TOKEN không hợp lệ hoặc đã bị thu hồi` (mã thoát 4) | Reset Token → dán lại |
+
+Ngoài ra bot giờ log **từng bước khởi động** `[1/5] … [5/5]`, nên nhìn dòng cuối là biết nó chết ở đâu.
+Nếu panel yêu cầu process phải mở cổng, đặt `HEALTH_PORT` (hoặc `PORT`) — bot sẽ mở endpoint `/` trả `{"ok":true}`.
+
 ## 5. Sự cố thường gặp trên panel
 
 | Hiện tượng | Nguyên nhân / cách xử lý |
