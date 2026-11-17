@@ -29,7 +29,7 @@ from store import AccountStore, StoreError  # noqa: E402
 
 def _store(args: argparse.Namespace, *, create: bool | None = None) -> AccountStore:
     """Mở kho dữ liệu. ``create`` mặc định lấy từ cờ --create của lệnh đang chạy."""
-    path = Path(args.data or os.environ.get("DATA_PATH") or DEFAULT_DATA_PATH)
+    path = Path(getattr(args, "data", None) or os.environ.get("DATA_PATH") or DEFAULT_DATA_PATH)
     store = AccountStore(path)
     if create is None:
         create = bool(getattr(args, "create", False))
@@ -139,16 +139,27 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Quản lý kho tài khoản của bot Discord")
     parser.add_argument(
         "--data",
+        default=argparse.SUPPRESS,
         help=f"đường dẫn file dữ liệu (mặc định: $DATA_PATH hoặc {DEFAULT_DATA_PATH})",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
+    def add_data_option(subparser: argparse.ArgumentParser) -> None:
+        """Cho phép đặt --data sau lệnh con: `manage.py list --data x.json`."""
+        subparser.add_argument(
+            "--data",
+            default=argparse.SUPPRESS,
+            help="đường dẫn file dữ liệu (đặt trước hoặc sau lệnh đều được)",
+        )
+
     p_list = sub.add_parser("list", help="liệt kê toàn bộ hồ sơ")
     p_list.add_argument("--create", action="store_true", help="tạo file nếu chưa có (rỗng)")
+    add_data_option(p_list)
     p_list.set_defaults(func=cmd_list)
 
     p_show = sub.add_parser("show", help="xem một hồ sơ")
     p_show.add_argument("user", help="ID Discord")
+    add_data_option(p_show)
     p_show.set_defaults(func=cmd_show)
 
     p_add = sub.add_parser("add", help="thêm/cập nhật tài khoản")
@@ -162,20 +173,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_add.add_argument("--verified", action="store_true", help="đánh dấu đã xác minh")
     p_add.add_argument("--note", help="ghi chú ngắn")
+    add_data_option(p_add)
     p_add.set_defaults(func=cmd_add)
 
     p_rm = sub.add_parser("remove", help="xoá tài khoản")
     p_rm.add_argument("--user", required=True)
     p_rm.add_argument("--type", required=True)
     p_rm.add_argument("--handle", required=True)
+    add_data_option(p_rm)
     p_rm.set_defaults(func=cmd_remove)
 
     p_note = sub.add_parser("note", help="đặt ghi chú nội bộ")
     p_note.add_argument("--user", required=True)
     p_note.add_argument("--text", default="", help="nội dung (rỗng để xoá)")
+    add_data_option(p_note)
     p_note.set_defaults(func=cmd_note)
 
     p_val = sub.add_parser("validate", help="kiểm tra file dữ liệu")
+    add_data_option(p_val)
     p_val.set_defaults(func=cmd_validate)
     return parser
 

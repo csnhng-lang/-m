@@ -205,6 +205,7 @@ python scripts/manage.py add --user 123456789012345678 --type steam --handle gab
 python scripts/manage.py remove --user 123456789012345678 --type steam --handle gaben
 python scripts/manage.py note --user 123456789012345678 --text "Đã xác minh"
 python scripts/manage.py validate          # kiểm tra file có hợp lệ không
+python scripts/manage.py list --data data/khac.json   # --data đặt trước hoặc sau lệnh đều được
 ```
 
 ---
@@ -220,7 +221,7 @@ embeds.py            Dựng embed + cắt ngắn theo giới hạn Discord (6000
 github_api.py        Tra GitHub công khai: cache TTL, xử lý 404/rate limit
 scripts/manage.py    CLI quản lý dữ liệu
 scripts/preview_embed.py  Xem trước embed (terminal / HTML), kiểm tra độ dài
-tests/               123 test: models, store, config, embeds, github, logic bot
+tests/               134 test: models, store, config, embeds, github, logic bot, CLI
 ```
 
 Kiểm tra chất lượng:
